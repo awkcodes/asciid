@@ -1,36 +1,51 @@
-// Load the image
-var img = new Image();
-img.src = "path/to/your/image.jpg";
-img.onload = function() {
-  // Create an off-screen canvas to draw the image
-  var canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
-  var ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0);
+const input = document.getElementById("input");
+const output = document.getElementById("output");
 
-  // Get the pixel data from the canvas
-  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  var pixels = imageData.data;
+input.addEventListener("change", async (event) => {
+  const image = new Image();
+  image.src = URL.createObjectURL(event.target.files[0]);
+  await new Promise((resolve) => (image.onload = resolve));
 
-  // ASCII characters to use for the art
-  var asciiChars = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
 
-  // Build the ASCII art string
-  var asciiArt = "";
-  for (var i = 0; i < pixels.length; i += 4) {
-    // Get the average brightness of the pixel
-    var brightness = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
-    // Map the brightness to an ASCII character
-    var charIndex = Math.floor((brightness / 255) * (asciiChars.length - 1));
-    asciiArt += asciiChars[charIndex];
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0);
+
+  const imageData = context.getImageData(0, 0, image.width, image.height);
+  const pixels = imageData.data;
+
+  const ASCII_CHARS = ["@", "#", "S", "%", "?", "*", "+", ";", ":", ",", "."];
+  const ASCII_PALETTE = [];
+  for (let i = 0; i < 256; i++) {
+    const charIndex = Math.floor((i / 255) * ASCII_CHARS.length);
+    ASCII_PALETTE[i] = ASCII_CHARS[charIndex];
   }
 
-  // Display the ASCII art in a div
-  var asciiArtDiv = document.createElement("div");
-  asciiArtDiv.style.fontFamily = "monospace";
-  asciiArtDiv.style.whiteSpace = "pre";
-  asciiArtDiv.textContent = asciiArt;
-  document.body.appendChild(asciiArtDiv);
-};
+  const getBrightness = (x, y) => {
+    const i = (y * image.width + x) * 4;
+    return (
+      0.34 * pixels[i] +
+      0.5 * pixels[i + 1] +
+      0.16 * pixels[i + 2]
+    );
+  };
+
+  const getASCII = (x, y) => {
+    const brightness = getBrightness(x, y);
+    const charIndex = Math.floor((brightness / 255) * ASCII_CHARS.length);
+    return ASCII_CHARS[charIndex];
+  };
+
+  let result = "";
+  for (let y = 0; y < image.height; y += 6) {
+    for (let x = 0; x < image.width; x += 4) {
+      result += getASCII(x, y);
+    }
+    result += "\n";
+  }
+
+  output.textContent = result;
+});
 
