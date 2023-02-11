@@ -26,6 +26,11 @@ img.onload = function() {
     asciiArt += asciiChars[charIndex];
   }
 
-  // Print the ASCII art to the console
-  console.log(asciiArt);
+  // Display the ASCII art in a div
+  var asciiArtDiv = document.createElement("div");
+  asciiArtDiv.style.fontFamily = "monospace";
+  asciiArtDiv.style.whiteSpace = "pre";
+  asciiArtDiv.textContent = asciiArt;
+  document.body.appendChild(asciiArtDiv);
 };
+
