@@ -1,6 +1,6 @@
-const input = document.getElementById("input");
-const output = document.getElementById("output");
-
+const handleInput = () =>{
+    console.log("imagechanged");
+}
 input.addEventListener("change", async (event) => {
   const image = new Image();
   image.src = URL.createObjectURL(event.target.files[0]);
@@ -49,3 +49,16 @@ input.addEventListener("change", async (event) => {
   output.textContent = result;
 });
 
+function App() {
+  return (
+    <div >
+        <h1>ASCIID</h1>
+        <h5>image to ascii art generator</h5>
+        <input type="file" id="input" accept="image/*"/>
+        <br></br>
+        <div id="output"></div>
+    </div>
+  );
+}
+
+export default App;
